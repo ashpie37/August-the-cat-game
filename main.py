@@ -41,9 +41,9 @@ class Knight(pygame.sprite.Sprite):
         
         #assign movement variables if moving left or right
         if moving_left:
-           dx = -self.speed 
-           self.flip = True
-           self.direction = -1
+            dx = -self.speed 
+            self.flip = True
+            self.direction = -1
         if moving_right:
             dx = +self.speed
             self.flip = False
