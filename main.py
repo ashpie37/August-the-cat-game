@@ -3,6 +3,8 @@ from pygame.locals import *
 import math
 
 pygame.init()
+
+#clock and frame rate
 clock = pygame.time.Clock()
 FPS = 60
 
@@ -10,19 +12,15 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = int(SCREEN_WIDTH * 0.8)
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption('Platform Game (Title TBH)')
+pygame.display.set_caption('August-The Cat Game')
 
 #colors
-color =  (122,197,205)
-#background color
+color =  (143,188,143)
+
 screen.fill(color)
-#loading images
-#be mindful of order I code imgs
-#bg_img = pygame.image.load('imgs/bkg2.png').convert()
-#bg_img_width = bg_img.get_width()
 
 #define game variables
-tile_size = 40 #math.ceil(SCREEN_WIDTH / bg_img_width) + 1
+tile_size = 40 
 
 #grid to help place items in graphic window
 def draw_grid():
@@ -31,14 +29,89 @@ def draw_grid():
         pygame.draw.line(screen, (255,255,255), (line * tile_size, 0), (line*tile_size, SCREEN_HEIGHT))
 class Player():
     def __init__(self, x, y):
-        img = pygame.image.load('Player/Idle/0.png')
-        self.image = pygame.transform.scale(img, (40, 80))
+        self.images_right = []
+        self.images_left = []
+        self.index = 0
+        self.counter = 0
+        for i in range(1, 8):
+            img_right = pygame.image.load(f'Fox_Player/Move/{i}.png').convert_alpha()
+            img_right = pygame.transform.scale(img_right, (50, 80))
+            img_left = pygame.transform.flip(img_right, True, False)
+            self.images_right.append(img_right)
+            self.images_left.append(img_left)
+        self.image = self.images_right[self.index]
         self.rect = self.image.get_rect()
         self.rect.x = x 
         self.rect.y = y 
+        self.vel_y = 0
+        self.jump = False
+        self.direction = 1
+        
+        
     def update(self):
+    
+        #delta variables
+        dx = 0
+        dy = 0
+        walk_cooldown = 5
+        
+        #keypresses
+        key = pygame.key.get_pressed()
+        if key[pygame.K_SPACE] and self.jump == False:
+            self.vel_y = -15 
+            self.jump = True
+        if key[pygame.K_SPACE] == False:
+            self.jump = False
+        if key[pygame.K_LEFT]:
+            dx -= 2
+            self.counter +=1
+            self.direction = -1
+        if key[pygame.K_RIGHT]:
+            dx += 2
+            self.counter += 1
+            self.direction = 1
+        if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False:
+           self.counter = 0
+           self.index= 0
+        if self.direction == 1:
+                self.image = self.images_right[self.index]
+        if self.direction == -1:
+                self.image = self.images_left[self.index]
+ 
+
+       
+        #animation
+        if self.counter > walk_cooldown:
+            self.counter = 0
+            self.index += 1
+            if self.index >= len(self.images_right):
+                self.index = 0
+            if self.direction == 1:
+                self.image = self.images_right[self.index]
+            if self.direction == -1:
+                self.image = self.images_left[self.index]
+        
+            
+        #gravity
+        self.vel_y += 1
+        if self.vel_y > 10: 
+            self.vel_y = 10
+        dy += self.vel_y
+        #check for collision
+        
+        #update player coordinates
+        self.rect.x += dx
+        self.rect.y += dy
+        
+        if self.rect.bottom > SCREEN_HEIGHT:
+            self.rect.bottom = SCREEN_HEIGHT
+            dy = 0
+        
+        
+        
         #draw player onto screen
-        screen.blit(self.image, self. rect)
+        screen.blit(self.image, self.rect)
+        pygame.draw.rect(screen, (255, 255, 255), self.rect, 2)
 
         
         
@@ -47,22 +120,22 @@ class World():
         self.tile_list =[]
     
     #load images
-        ice_img = pygame.image.load('imgs/iceBlock.png')
-        ice_water_img = pygame.image.load('imgs/iceWaterDeep.png')
+        dirt_img = pygame.image.load('imgs/dirt.png')
+        grass_img = pygame.image.load('imgs/grass.png')
         
         row_count = 0
         for row in data:
             col_count = 0
             for tile in row:
                 if tile == 1:
-                    img = pygame.transform.scale(ice_water_img, (tile_size, tile_size))
+                    img = pygame.transform.scale(dirt_img, (tile_size, tile_size))
                     img_rect = img.get_rect()
                     img_rect.x = col_count * tile_size
                     img_rect.y = row_count * tile_size
                     tile = (img, img_rect)
                     self.tile_list.append(tile)
                 if tile == 2:
-                    img = pygame.transform.scale(ice_img, (tile_size, tile_size))
+                    img = pygame.transform.scale(grass_img, (tile_size, tile_size))
                     img_rect = img.get_rect()
                     img_rect.x = col_count * tile_size
                     img_rect.y = row_count * tile_size
@@ -90,23 +163,25 @@ world_data = [
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],  
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 2, 2, 2, 2, 2, 1], 
 [1, 0, 0, 0, 0, 0, 2, 2, 2, 6, 6, 6, 6, 6, 1, 1, 1, 1, 1, 1], 
-[1, 0, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-[1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
+[1, 0, 0, 0, 0, 2, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1], 
+[1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
 ]
 
-player = Player(40, SCREEN_HEIGHT - 95)
+player = Player(70, SCREEN_HEIGHT - 95)
 world = World(world_data)
 
 
 run = True
 while run:
     
-    #screen.blit(bg_img, (0, 0))
+    clock.tick(FPS)
     
     world.draw()
+    
     player.update()
-    clock.tick(FPS)
+    
     draw_grid()
+    
     #event handler
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
