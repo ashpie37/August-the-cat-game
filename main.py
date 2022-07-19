@@ -1,5 +1,8 @@
-#Coin Sprite by DasBilligeAlien
-#https://opengameart.org/content/rotating-coin-0
+#Pixel Platformer by Kenney
+#https://kenney.nl/assets/pixel-platformer
+
+#Castle Background by Saphatthachat Sunchoote
+#https://www.dreamstime.com/pixel-art-fantasy-castle-roof-image223418688
 
 import pygame
 from pygame.locals import *
@@ -11,7 +14,7 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = int(SCREEN_WIDTH * 0.8)
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption('King August')
+pygame.display.set_caption('Castleton')
 
 #clock and frame rate
 clock = pygame.time.Clock()
@@ -23,11 +26,17 @@ game_over = 0
 main_menu = True
 
 #load images
+title_img = pygame.image.load('imgs/title_img13.png')
+title_img = pygame.transform.scale(title_img, (800, 800))
+castle_img = pygame.image.load('imgs/castle-1.png')
 dirt_img = pygame.image.load('imgs/dirt.png')
-grass_img = pygame.image.load('imgs/grass.png')
+ground_img = pygame.image.load('imgs/ground.png')
+gem_img = pygame.image.load('imgs/gem.png')
 restart_img = pygame.image.load('imgs/restart_btn.png')
 start_img = pygame.image.load('imgs/start_btn.png')
-exit_img = pygame.image.load('imgs/exit_btn.png')
+start_img = pygame.transform.scale(start_img, (270, 120))
+
+
 
 '''
 ---grid to help place items in graphic window---
@@ -38,9 +47,12 @@ def draw_grid():
 '''
 
 #define colors
-color = (137, 207, 240) #(143,188,143)     
+color = (157, 211, 255)   
+
+#game backgrounds
 def draw_bg():
     screen.fill(color)
+
     
 #buttons
 class Button():
@@ -63,21 +75,17 @@ class Button():
                 self.clicked = True
         if pygame.mouse.get_pressed()[0]:
             self.clicked = False
+            
         #draw button
         screen.blit(self.image, self.rect)
         return action
 
 
-
-
-
 class Player():
     def __init__(self, x, y):
         self.reset(x,y)
-        
-        
+         
     def update(self, game_over):
-    
         #delta variables
         dx = 0
         dy = 0
@@ -107,8 +115,6 @@ class Player():
             if self.direction == -1:
                     self.image = self.images_left[self.index]
     
-
-        
             #animation
             if self.counter > walk_cooldown:
                 self.counter = 0
@@ -120,13 +126,11 @@ class Player():
                 if self.direction == -1:
                     self.image = self.images_left[self.index]
             
-                
             #gravity
             self.vel_y += 1
             if self.vel_y > 10: 
                 self.vel_y = 10
             dy += self.vel_y
-            
             
             #check for collision
             self.in_air = True
@@ -147,9 +151,8 @@ class Player():
                         self.in_air = False
                         
             #check collision with enemies
-            if pygame.sprite.spritecollide(self, skeleton_group, False):
+            if pygame.sprite.spritecollide(self, enemy_group, False):
                 game_over = -1
-            
             
             #update player coordinates
             self.rect.x += dx
@@ -160,11 +163,9 @@ class Player():
         
         #draw player onto screen
         screen.blit(self.image, self.rect)
-        pygame.draw.rect(screen, (255, 255, 255), self.rect, 2)
+        #pygame.draw.rect(screen, (0, 0, 0), self.rect, 2)
         return game_over
     
-
-
     def reset(self, x, y): 
         self.images_right = []
         self.images_left = []
@@ -193,8 +194,6 @@ class Player():
 class World():
     def __init__(self, data):
         self.tile_list =[]
-        
-        
         row_count = 0
         for row in data:
             col_count = 0
@@ -207,42 +206,39 @@ class World():
                     tile = (img, img_rect)
                     self.tile_list.append(tile)
                 if tile == 2:
-                    img = pygame.transform.scale(grass_img, (tile_size, tile_size))
+                    img = pygame.transform.scale(ground_img, (tile_size, tile_size))
                     img_rect = img.get_rect()
                     img_rect.x = col_count * tile_size
                     img_rect.y = row_count * tile_size
                     tile = (img, img_rect)
                     self.tile_list.append(tile)
                 if tile == 3:
-                    skeleton = Enemy(col_count * tile_size, row_count * tile_size + 8)
-                    skeleton_group.add(skeleton)
+                    enemy = Enemy(col_count * tile_size, row_count * tile_size + 8)
+                    enemy_group.add(enemy)
                 if tile == 4:
-                    for i in range (1,6):
-                        coin_img = pygame.image.load(f'imgs/Coin/{i}.png')
-                        img = pygame.transform.scale(coin_img, (tile_size,tile_size))
-                        img_rect = img.get_rect()
-                        img_rect.x = col_count * tile_size
-                        img_rect.y = row_count * tile_size
-                        tile = (img, img_rect)
-                        self.tile_list.append(tile)
+                    img = pygame.transform.scale(gem_img, (25, 20))
+                    img_rect = img.get_rect()
+                    img_rect.x = col_count * tile_size
+                    img_rect.y = row_count * tile_size
+                    tile = (img, img_rect)
+                    self.tile_list.append(tile)
                 col_count += 1
             row_count += 1
     def draw(self):
         for tile in self.tile_list:
             screen.blit(tile[0], tile[1])
-            pygame.draw.rect(screen, (255, 255, 255), tile[1], 2)
+            #pygame.draw.rect(screen, (0, 0, 0), tile[1], 2)
+
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        for i in range (1, 7):
-            self.image = pygame.image.load(f'Mushroom/Walk/{i}.png')        
+        self.image = pygame.image.load('Enemies/Block/0.png').convert_alpha()        
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
         self.move_direction = 1
         self.move_counter = 0
-
         
     def update(self):
         self.rect.x += self.move_direction
@@ -252,8 +248,6 @@ class Enemy(pygame.sprite.Sprite):
             self.move_counter *= -1
         
 
-        
-
 world_data = [
 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
@@ -261,7 +255,7 @@ world_data = [
 [1, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 1], 
-[1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1, 1, 1, 1], 
+[1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1, 1, 1, 1], 
 [1, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1], 
 [1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1], 
 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1], 
@@ -270,19 +264,19 @@ world_data = [
 [1, 0, 0, 0, 2, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
 [1, 0, 0, 2, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
 [1, 0, 0, 0, 0, 4, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-[1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1], 
+[1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
 ]
 
 #player
 player = Player(100, SCREEN_HEIGHT - 40)
 #enemy
-skeleton_group = pygame.sprite.Group()
+enemy_group = pygame.sprite.Group()
 #world
 world = World(world_data)
 #buttons
-restart_button = Button(SCREEN_WIDTH // 2 - 15, SCREEN_HEIGHT // 2 + 100, restart_img)
-start_button = Button(SCREEN_WIDTH // 2 - 350, SCREEN_HEIGHT // 2, start_img)
-exit_button = Button(SCREEN_WIDTH // 2 + 100, SCREEN_HEIGHT // 2, exit_img)
+restart_button = Button(340, 0, restart_img)
+start_button = Button(260, 375, start_img)
+
 
 run = True
 while run:
@@ -294,18 +288,17 @@ while run:
     clock.tick(FPS)
     
     if main_menu == True:
-        if exit_button.draw():
-            run = False
+        screen.blit(castle_img,(0,0))
+        screen.blit(title_img,(20,-120))
         if start_button.draw():
             main_menu = False
     else:
         world.draw()
         if game_over == 0:
-            skeleton_group.update()
-        skeleton_group.draw(screen)
+            enemy_group.update()
+        enemy_group.draw(screen)
         
         game_over = player.update(game_over)
-        
         
         #if player died
         if game_over == -1:
@@ -313,7 +306,6 @@ while run:
                 player.reset(100, SCREEN_HEIGHT - 40)
                 game_over = 0
 
-            
     #event handler
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
