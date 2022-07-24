@@ -6,8 +6,13 @@
 
 import pygame
 from pygame.locals import *
+from pygame import mixer
 import math
+import pickle
+from os import path
 
+pygame.mixer.pre_init(44100, -16, 2, 512)
+mixer.init()
 pygame.init()
 
 SCREEN_WIDTH = 800
@@ -20,24 +25,31 @@ pygame.display.set_caption('Castleton')
 clock = pygame.time.Clock()
 FPS = 60
 
+#define font
+font = pygame.font.SysFont('Banhaus 93', 70)
+font_score = pygame.font.SysFont('Banhaus 93', 30)
+
+
 #define game variables
 tile_size = 40
 game_over = 0
 main_menu = True
+level = 1
+max_levels = 3
+score = 0
 
 #load images
-title_img = pygame.image.load('imgs/title_img13.png')
+title_img = pygame.image.load('imgs/title_img.png')
 title_img = pygame.transform.scale(title_img, (800, 800))
 castle_img = pygame.image.load('imgs/castle-1.png')
 dirt_img = pygame.image.load('imgs/dirt.png')
 ground_img = pygame.image.load('imgs/ground.png')
-gem_img = pygame.image.load('imgs/gem.png')
 restart_img = pygame.image.load('imgs/restart_btn.png')
 start_img = pygame.image.load('imgs/start_btn.png')
 start_img = pygame.transform.scale(start_img, (270, 120))
 
-
-
+#load sounds
+gem_effect = pygame.mixer.Sound('Sounds/gem.wav')
 '''
 ---grid to help place items in graphic window---
 def draw_grid():
@@ -47,11 +59,32 @@ def draw_grid():
 '''
 
 #define colors
-color = (157, 211, 255)   
+blue = (157, 211, 255)   
+white = (255, 255, 255)
 
 #game backgrounds
 def draw_bg():
-    screen.fill(color)
+    screen.fill(blue)
+
+#draw text to screen
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x,y))
+
+
+#reset function to reset level
+def reset_level(level):
+    player.reset(100, SCREEN_HEIGHT - 40)
+    enemy_group.empty()
+    flag_group.empty()
+
+    #load on level data and create world
+    if path.exists(f'level{level}_data'):
+        pickle_in = open(f'level{level}_data', 'rb')
+        world_data = pickle.load(pickle_in)
+    world = World(world_data)
+    return world
+
 
     
 #buttons
@@ -153,12 +186,16 @@ class Player():
             #check collision with enemies
             if pygame.sprite.spritecollide(self, enemy_group, False):
                 game_over = -1
+            #check collision with flag
+            if pygame.sprite.spritecollide(self, flag_group, False):
+                game_over = 1
             
             #update player coordinates
             self.rect.x += dx
             self.rect.y += dy
             
         elif game_over == -1:
+            draw_text('GAME OVER!', font, white,(SCREEN_WIDTH // 2) - 200, SCREEN_HEIGHT // 2)
             self.image = self.death_image
         
         #draw player onto screen
@@ -216,12 +253,11 @@ class World():
                     enemy = Enemy(col_count * tile_size, row_count * tile_size + 8)
                     enemy_group.add(enemy)
                 if tile == 4:
-                    img = pygame.transform.scale(gem_img, (25, 20))
-                    img_rect = img.get_rect()
-                    img_rect.x = col_count * tile_size
-                    img_rect.y = row_count * tile_size
-                    tile = (img, img_rect)
-                    self.tile_list.append(tile)
+                    gem= Gem(col_count * tile_size, row_count * tile_size + 8)
+                    gem_group.add(gem)
+                if tile == 5:
+                    flag = Flag(col_count * tile_size, row_count * tile_size + 8)
+                    flag_group.add(flag) 
                 col_count += 1
             row_count += 1
     def draw(self):
@@ -229,11 +265,27 @@ class World():
             screen.blit(tile[0], tile[1])
             #pygame.draw.rect(screen, (0, 0, 0), tile[1], 2)
 
+class Flag(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        img = pygame.image.load('imgs/flag.png')
+        self.image = pygame.transform.scale(img, (tile_size // 2, tile_size // 2))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+class Gem(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        img = pygame.image.load('imgs/gem.png')
+        self.image = pygame.transform.scale(img, (tile_size // 2, tile_size // 2))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('Enemies/Block/0.png').convert_alpha()        
+        img = pygame.image.load('imgs/enemy.png')
+        self.image = pygame.transform.scale(img, (tile_size // 2, tile_size // 2))       
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -247,32 +299,26 @@ class Enemy(pygame.sprite.Sprite):
             self.move_direction *= -1
             self.move_counter *= -1
         
-
-world_data = [
-[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 1], 
-[1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1, 1, 1, 1], 
-[1, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1], 
-[1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1], 
-[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1], 
-[1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-[1, 0, 0, 0, 0, 2, 0, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],  
-[1, 0, 0, 0, 2, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-[1, 0, 0, 2, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-[1, 0, 0, 0, 0, 4, 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-[1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-]
-
+# 16 rows, 20 columns
 #player
 player = Player(100, SCREEN_HEIGHT - 40)
 #enemy
 enemy_group = pygame.sprite.Group()
-#world
+#flag
+flag_group = pygame.sprite.Group()
+#gem
+gem_group = pygame.sprite.Group()
+
+#dummy gem for showing score
+score_gem = Gem(tile_size //2, tile_size // 2)
+gem_group.add(score_gem)
+
+#load level data and create world
+if path.exists(f'level{level}_data'):
+    pickle_in = open(f'level{level}_data', 'rb')
+    world_data = pickle.load(pickle_in)
 world = World(world_data)
+
 #buttons
 restart_button = Button(340, 0, restart_img)
 start_button = Button(260, 375, start_img)
@@ -289,22 +335,51 @@ while run:
     
     if main_menu == True:
         screen.blit(castle_img,(0,0))
-        screen.blit(title_img,(20,-120))
+        screen.blit(title_img,(54,-120))
         if start_button.draw():
             main_menu = False
     else:
         world.draw()
         if game_over == 0:
             enemy_group.update()
+        #update score
+            if pygame.sprite.spritecollide(player, gem_group, True):
+                score += 1
+            draw_text('X' + str(score), font_score, white, tile_size - 10, 10)
+
         enemy_group.draw(screen)
+        flag_group.draw(screen)
+        gem_group.draw(screen)
         
         game_over = player.update(game_over)
         
         #if player died
         if game_over == -1:
             if restart_button.draw():
-                player.reset(100, SCREEN_HEIGHT - 40)
+                world_data =[]
+                world = reset_level(level)
                 game_over = 0
+                score = 0
+
+        #if player completes level
+        if game_over == 1:
+            #reset game and go to next level
+            level += 1
+            if level <= max_levels:
+                #reset level
+                world_data =[]
+                world = reset_level(level)
+                game_over = 0 
+            else:
+                draw_text('YOU WIN!', font, white, (SCREEN_WIDTH //2)- 140, SCREEN_HEIGHT //2)
+                #restart game
+                if restart_button.draw():
+                    level = 1
+                    world_data =[]
+                    world = reset_level(level)
+                    game_over = 0
+                    score = 0
+
 
     #event handler
     for event in pygame.event.get():
