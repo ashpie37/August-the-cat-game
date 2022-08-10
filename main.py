@@ -50,7 +50,7 @@ score = 0
 #load images
 title_img = pygame.image.load('imgs/title_img.png')
 title_img = pygame.transform.scale(title_img, (800, 800))
-castle_img = pygame.image.load('imgs/castle.png')
+castle_img = pygame.image.load('imgs/castle-1.png')
 dirt_img = pygame.image.load('imgs/dirt.png')
 ground_img = pygame.image.load('imgs/ground.png')
 restart_img = pygame.image.load('imgs/restart_btn.png')
