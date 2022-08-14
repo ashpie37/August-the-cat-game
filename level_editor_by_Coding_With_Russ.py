@@ -1,4 +1,5 @@
 #level editor by Coding with Russ
+#this was edited for 'Castleton' 
 
 import pygame
 import pickle
@@ -31,11 +32,9 @@ castle_img = pygame.image.load('imgs/castle-1.png')
 dirt_img = pygame.image.load('imgs/dirt.png')
 ground_img = pygame.image.load('imgs/ground.png')
 gem_img = pygame.image.load('imgs/gem.png')
-block_img = pygame.image.load('Enemies/Block/0.png')
 save_img = pygame.image.load('imgs/save_btn.png')
 load_img = pygame.image.load('imgs/load_btn.png')
 door_img = pygame.image.load('imgs/crown.png')
-circle_img = pygame.image.load('Enemies/Circle/0.png')
 spikes_img = pygame.image.load('imgs/spikes.png')
 water_img = pygame.image.load('imgs/water.png')
 
@@ -191,5 +190,4 @@ while run:
 
 	#update game display window
 	pygame.display.update()
-
 pygame.quit()

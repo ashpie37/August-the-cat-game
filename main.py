@@ -11,7 +11,7 @@
 #Castle Background by Saphatthachat Sunchoote
 #https://www.dreamstime.com/pixel-art-fantasy-castle-roof-image223418688
 
-#Game Theme by xDeviruchi
+#Game Theme Music by xDeviruchi
 #https://xdeviruchi.itch.io/8-bit-fantasy-adventure-music-pack
 
 import pygame
@@ -68,14 +68,6 @@ game_over_effect = pygame.mixer.Sound('Sounds/game_over.wav')
 game_over_effect.set_volume(0.5)
 water_effect = pygame.mixer.Sound('Sounds/splash.wav')
 water_effect.set_volume(0.5)
-
-'''
-#grid to help place items in graphic window
-def draw_grid():
-    for line in range(0, 20):
-       pygame.draw.line(screen, (255,255,255), (0, line * tile_size), (SCREEN_WIDTH, line * tile_size ))
-       pygame.draw.line(screen, (255,255,255), (line * tile_size, 0), (line*tile_size, SCREEN_HEIGHT))
-'''
 
 #define colors
 blue = (200, 230, 252)   
@@ -332,7 +324,6 @@ class Gem(pygame.sprite.Sprite):
         self.rect.center = (x, y)
     
 
-# 16 rows, 20 columns
 #player
 player = Player(100, SCREEN_HEIGHT - 40)
 #door
@@ -360,7 +351,7 @@ start_button = Button(260, 375, start_img)
 
 run = True
 while run:
-    #draw_grid()
+
     draw_bg()
     clock.tick(FPS)
     if main_menu == True:
@@ -402,7 +393,7 @@ while run:
                 world = reset_level(level)
                 game_over = 0 
             else:
-                draw_text('YOU WIN!', font, black, 100, 140)
+                draw_text('YOU WIN!', font, black, 100, 300)
                 #restart game
                 if restart_button.draw():
                     level = 1
