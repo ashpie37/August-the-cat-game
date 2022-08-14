@@ -1,2 +1,2 @@
 # Castleton-python-game
-More info coming soon.
+more info coming soon.
