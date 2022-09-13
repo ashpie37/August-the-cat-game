@@ -9,7 +9,7 @@
 
 
 
-<!-- PROJECT LOGO -->
+<!-- PROJECT -->
 <br />
 <div align="center">
   <a href="https://github.com/ashpie37/Castleton-python-game">
@@ -64,7 +64,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+![Product Name Screen Shot][product-screenshot]
 
 Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `ashpie37`, `Castleton-python-game`, `linkedin_username`, `email_client`, `abarnes377@gmail.com`, `Castleton`, `project_description`
 
@@ -212,7 +212,7 @@ A big THANK YOU to these individuals down below:
 [license-url]: https://github.com/ashpie37/Castleton-python-game/blob/main/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/ashli-barnes
-[product-screenshot]: imgs/screenshot.png 
+[product-screenshot]: imgs/logo.png
 
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
 [Next-url]: https://nextjs.org/
