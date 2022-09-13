@@ -19,7 +19,7 @@
 <h3 align="center">Castleton</h3>
 
   <p align="center">
-  Castleton is a user-friendly platform game created using Python and the pygame library. The game features 3 exciting and challenging levels. Collect all   the gems and crowns to win the game!    <br />
+  Castleton is a user-friendly platform game created with Python and the pygame library. The game features 3 exciting and challenging levels. Collect all   the gems and crowns to win the game!    <br />
     <a href="https://github.com/ashpie37/Castleton-python-game"><strong>Explore the docs »</strong></a>
     <br />
     <br />
