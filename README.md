@@ -79,7 +79,6 @@ To get a local copy up and running follow these simple example steps.
 
 <!-- USAGE EXAMPLES -->
 ## Usage
- ![Game Logo][product-screenshot2]
  ![Game][product-screenshot]
 
 _For more examples, please refer to the [Platformer Pygame Tutorial](http://codingwithruss.com/pygame/platformer/intro.html)_
@@ -146,4 +145,3 @@ A big THANK YOU to these individuals down below:
 [Python.py]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
 [Python-url]: https://www.python.org
 [product-screenshot]: imgs/lvl1.png
-[product-screenshot2]: imgs/game_over.png
