@@ -146,4 +146,4 @@ A big THANK YOU to these individuals down below:
 [Python.py]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
 [Python-url]: https://www.python.org
 [product-screenshot]: imgs/lvl1.png
-[product-screenshot2]: imgs/logo.png
+[product-screenshot2]: imgs/game_over.png
