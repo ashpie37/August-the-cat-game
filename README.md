@@ -64,7 +64,7 @@ To get a local copy up and running follow these simple example steps.
   pip install pygame 
   ``` 
 ### Installation
-1. Make sure you already have Python installed. [(https://www.python.org/downloads/)](https://www.python.org/downloads/)
+1. Make sure you already have Python installed [(https://www.python.org/downloads/)](https://www.python.org/downloads/)
 2. Install pygame library
    ```sh
    pip pygame install
@@ -78,8 +78,8 @@ To get a local copy up and running follow these simple example steps.
 
 <!-- USAGE EXAMPLES -->
 ## Usage
- ![Game][product-screenshot]
-_For more examples, please refer to the [Platformer Pygame Tutorial](http://codingwithruss.com/pygame/platformer/intro.html)_
+ ![Game][product-screenshot] </br>
+_For more examples, please refer to the [Platformer Pygame Tutorial](http://codingwithruss.com/pygame/platformer/intro.html)_ </br>
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
